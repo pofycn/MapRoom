@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 
 """
-查询适合的租房信息
+查找适合的租房信息
 """
-import requests
+import csv
 import json
 import time
-import csv
-import re
+
+import requests
 
 baidu_map_place_api_url = "http://api.map.baidu.com/place/v2"
 baidu_map_direction_api_url = "http://api.map.baidu.com/direction/v2"
@@ -22,8 +22,12 @@ room_result_data = open("RoomData/room_result.txt", "w")
 csv_writer = csv.writer(room_result_data, delimiter=',')
 
 
-# 根据UID查询百度地图API返回地点详细信息
 def get_location_details(uid):
+    """
+    根据UID查询百度地图API返回地点详细信息
+    :param uid: 地点ID
+    :return:地点信息
+    """
     url = baidu_map_place_api_url \
           + "/detail?uid=" + uid \
           + "&&output=" + output \
@@ -34,8 +38,15 @@ def get_location_details(uid):
     return str(r.text)
 
 
-# 根据地点及城市名查询地点详情
 def query_location_by_name(location_name, region, city_limit):
+    """
+    根据地点及城市名查询地点详情
+    :param location_name:地点名称
+    :param region:城市区域
+    :param city_limit:是否现在在该城市查找
+    :return:地点信息
+    """
+
     # 防止被API限制并发，返回结果正确则直接返回，401则重试
     while True:
         url = baidu_map_place_api_url + "/suggestion?query=" \
@@ -56,8 +67,13 @@ def query_location_by_name(location_name, region, city_limit):
             return str(r.text)
 
 
-# 根据起点及终点坐标信息获取路线信息
 def get_direction_transit(origin_position, destination_position):
+    """
+    根据起点及终点坐标信息获取路线信息
+    :param origin_position:起点坐标信息
+    :param destination_position:目的地坐标信息
+    :return:路线信息结果
+    """
     # 并发控制  免费API限制QPS
     while True:
         time.sleep(1)
@@ -74,8 +90,12 @@ def get_direction_transit(origin_position, destination_position):
         return str(r.text)
 
 
-# 获取行程时长及路线的平均时长
 def get_duration(direction_result_str):
+    """
+    获取行程时长及路线的平均时长
+    :param direction_result_str:路线信息结果
+    :return:平均路线耗时
+    """
     direction_result = json.loads(direction_result_str)
     # print(direction_result['result']['routes'])
     sum_time = 0
@@ -89,8 +109,12 @@ def get_duration(direction_result_str):
     return ave_cost_time
 
 
-# 根据地点信息获取周围附近的坐标
 def get_position(location_result_str):
+    """
+    根据地点信息获取周围附近的坐标
+    :param location_result_str:地点信息
+    :return:地点坐标
+    """
     location_result = json.loads(location_result_str)
     latitude = location_result['result'][0]['location']['lat']
     longitude = location_result['result'][0]['location']['lng']
@@ -98,8 +122,11 @@ def get_position(location_result_str):
     return str(latitude) + "," + str(longitude)
 
 
-# 从文件中读取房源地址
 def get_room_address_from_file():
+    """
+    从文件中读取房源地址
+    :return:租房地点名称list
+    """
     file = open('RoomData/room_data.csv', 'r')
     result_list = list()
     count_lines = 0
@@ -113,8 +140,12 @@ def get_room_address_from_file():
     return result_list
 
 
-# 根据房间信息结果找到符合条件的房间信息
 def find_my_room(room_info_list):
+    """
+    根据房间信息结果找到符合条件的房间信息
+    :param room_info_list:租房信息list
+    :return:合适的租房信息list
+    """
     des_pos_location_str = query_location_by_name(office_location_name, region, "true")
     des_pos_location = get_position(des_pos_location_str)
     print("destination_position:", des_pos_location)

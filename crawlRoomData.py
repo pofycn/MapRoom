@@ -1,3 +1,11 @@
+# -*- coding: utf-8 -*-
+
+"""
+crawlRoomData
+~~~~~~~~~~~~
+抓取58页面上的公寓租房信息
+"""
+
 from bs4 import BeautifulSoup
 import requests
 import csv
