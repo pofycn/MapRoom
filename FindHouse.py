@@ -190,12 +190,12 @@ if __name__ == "__main__":
 
     # get_room_address_from_file()
 
-    region = "深圳"
-    # region = input("请输入你所在的城市：")
-    office_location_name = '百度国际大厦'
-    # office_location_name = input("请输入工作地点：")
-    traffic_time = "60"
-    # traffic_time = input("请输入期望的通勤时间：")
+    # region = "深圳"
+    region = input("请输入你所在的城市：")
+    # office_location_name = '百度国际大厦'
+    office_location_name = input("请输入工作地点：")
+    # traffic_time = "60"
+    traffic_time = input("请输入期望的通勤时间：")
 
     room_info_list = get_room_address_from_file()
     find_my_room(room_info_list)
